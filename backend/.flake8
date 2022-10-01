@@ -1,0 +1,19 @@
+[flake8]
+    # `black` creates these ones
+    ignore = E203, E266, E501, W503
+    # line length is intentionally set to 88 here to mirror black code style
+    max-line-length = 88
+    max-complexity = 18
+    select = B,C,E,F,W,T4,B9
+    exclude =
+        .git,
+        __pycache__,
+        build,
+        dist,
+        venv,
+        scripts,
+        .coverage,
+        .tox,
+        .pytest_cache,
+        .venv,
+        .cache

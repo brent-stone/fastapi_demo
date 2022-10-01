@@ -1,0 +1,105 @@
+version: "3.8"
+
+services:
+  api:
+    # This starts GUnicorn without live-reload
+    command: /start.sh
+    container_name: demo_backend-api
+    # env_file:
+    #   - .env
+    # The .env import function is nice, but let's explicitly have some redundant setting declaration
+    # for both clarity and error traceability by catching and reporting .env file issues as early in
+    # the stack execution as possible.
+    environment:
+      DEBUG: 'false'
+
+      PROJECT_NAME: "${PROJECT_NAME:?missing .env file with PROJECT_NAME}"
+      PROJECT_VERSION: "${PROJECT_VERSION:?missing .env file with PROJECT_VERSION}"
+      DEFAULT_EMAIL: "${DEFAULT_EMAIL:?missing .env file with DEFAULT_EMAIL}"
+
+      SECRET_KEY: "{SECRET_KEY:?missing .env file with SECRET_KEY}"
+      HASH_ALGORITHM: "${HASH_ALGORITHM:?missing .env file with HASH_ALGORITHM}"
+      ACCESS_TOKEN_EXPIRE_MINUTES: "${ACCESS_TOKEN_EXPIRE_MINUTES:?missing .env file with ACCESS_TOKEN_EXPIRE_MINUTES}"
+      BACKEND_CORS_ORIGINS: "${BACKEND_CORS_ORIGINS:?missing .env file with BACKEND_CORS_ORIGINS}"
+
+      POSTGRES_USER: "${POSTGRES_USER:?missing .env file with POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?missing .env file with POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB:?missing .env file with POSTGRES_DB}"
+      POSTGRES_SERVER: "${POSTGRES_SERVER:?missing .env file with POSTGRES_SERVER}"
+      POSTGRES_PORT: "${POSTGRES_PORT:?missing .env file with POSTGRES_PORT}"
+
+      CELERY_BROKER_URL: "${CELERY_BROKER_URL:?missing .env file with CELERY_BROKER_URL}"
+      CELERY_RESULT_BACKEND: "${CELERY_RESULT_BACKEND:?missing .env file with CELERY_RESULT_BACKEND}"
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+
+    ports:
+      - "${API_PORT:?missing .env file with API_PORT}:8883"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  db:
+    container_name: demo_backend-db
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER:?missing .env file with POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?missing .env file with POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB:?missing .env file with POSTGRES_DB}"
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "${POSTGRES_USER}" ]
+      interval: 5s
+      timeout: 30s
+      retries: 5
+    restart: always
+
+  redis:
+    container_name: demo_backend-redis
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 30s
+      retries: 10
+    restart: always
+
+  worker:
+    command:
+      celery --app=demo_backend.celery.celery worker --loglevel=info
+    container_name: demo_backend-celery
+    environment:
+      DEBUG: 'false'
+
+      PROJECT_NAME: "${PROJECT_NAME:?missing .env file with PROJECT_NAME}"
+      PROJECT_VERSION: "${PROJECT_VERSION:?missing .env file with PROJECT_VERSION}"
+      DEFAULT_EMAIL: "${DEFAULT_EMAIL:?missing .env file with DEFAULT_EMAIL}"
+
+      SECRET_KEY: "{SECRET_KEY:?missing .env file with SECRET_KEY}"
+      HASH_ALGORITHM: "${HASH_ALGORITHM:?missing .env file with HASH_ALGORITHM}"
+      ACCESS_TOKEN_EXPIRE_MINUTES: "${ACCESS_TOKEN_EXPIRE_MINUTES:?missing .env file with ACCESS_TOKEN_EXPIRE_MINUTES}"
+      BACKEND_CORS_ORIGINS: "${BACKEND_CORS_ORIGINS:?missing .env file with BACKEND_CORS_ORIGINS}"
+
+      POSTGRES_USER: "${POSTGRES_USER:?missing .env file with POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?missing .env file with POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB:?missing .env file with POSTGRES_DB}"
+      POSTGRES_SERVER: "${POSTGRES_SERVER:?missing .env file with POSTGRES_SERVER}"
+      POSTGRES_PORT: "${POSTGRES_PORT:?missing .env file with POSTGRES_PORT}"
+
+      CELERY_BROKER_URL: "${CELERY_BROKER_URL:?missing .env file with CELERY_BROKER_URL}"
+      CELERY_RESULT_BACKEND: "${CELERY_RESULT_BACKEND:?missing .env file with CELERY_RESULT_BACKEND}"
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    depends_on:
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres-db-volume:

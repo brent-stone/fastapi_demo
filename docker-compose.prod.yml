@@ -1,0 +1,20 @@
+services:
+  api:
+    command: /start.sh
+    container_name: demo_backend-backend-prod
+    image: autoai-backend-prod
+    environment:
+      PRODUCTION: 'true'
+
+  web:
+#    command: nginx -g daemon off;
+    container_name: demo_backend-frontend-prod
+    image: autoai-frontend-prod
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production
+    ports:
+      - "80:80"
+    environment:
+      PRODUCTION: 'true'
