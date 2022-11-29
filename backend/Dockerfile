@@ -4,51 +4,111 @@ WORKDIR /tmp
 
 RUN pip install poetry
 
-COPY ./pyproject.toml ./poetry.lock* /tmp/
+COPY ./pyproject.toml pyproject.toml
+COPY ./poetry.lock poetry.lock
 
 RUN poetry export --format requirements.txt --output requirements.txt --without-hashes
-RUN poetry export --format requirements.txt --output requirements-dev.txt --without-hashes --dev
+RUN poetry export --format requirements.txt --output requirements-dev.txt --without-hashes --with dev
 
-FROM python:3.10-slim as production
+FROM python:3.10-slim as development
 
 LABEL maintainer="Brent Stone <brent-stone@github.com>"
 
-COPY ./start.sh /start.sh
-RUN chmod +x /start.sh
+# Ensure curl is available for healthcheck via curl
+RUN apt update
+RUN apt upgrade -y
+RUN apt install curl -y
 
-COPY ./gunicorn_conf.py /gunicorn_conf.py
+# Install git. NOTE: The Git repo and information will be mounted via docker-compose
+# The additional packages are to support compiling google-re python wheel with the C++
+# library
+RUN apt-get install -y --no-install-recommends git gcc g++ libre2-dev
+RUN apt-get purge -y --auto-remove
+RUN rm -rf /var/lib/apt/lists/*
 
-COPY ./start-reload.sh /start-reload.sh
-RUN chmod +x /start-reload.sh
+WORKDIR /fastapi_demo/backend
 
-COPY ./prestart.sh /app/prestart.sh
-RUN chmod +x /app/prestart.sh
+COPY ./start.sh start.sh
+RUN chmod +x start.sh
 
-COPY ./alembic.ini /app/alembic.ini
-COPY ./pyproject.toml /app/pyproject.toml
+COPY ./gunicorn_conf.py gunicorn_conf.py
 
-# For now we're going to bloat the prod image with dev dependencies.
-# TODO: Look for layering in an install of prod requirements, then dev requirements, then
-#  do a good job of referencing the appropriate layer from docker compose.
-COPY --from=requirements-stage /tmp/requirements.txt /app/requirements.txt
-#COPY --from=requirements-stage /tmp/requirements-dev.txt /app/requirements.txt
+COPY ./start-reload.sh start-reload.sh
+RUN chmod +x start-reload.sh
 
+COPY ./prestart.sh prestart.sh
+RUN chmod +x prestart.sh
 
-# Caching pip with BuildKit: https://pythonspeed.com/articles/docker-cache-pip-downloads/
+COPY --from=requirements-stage /tmp/requirements-dev.txt /fastapi_demo/backend/requirements.txt
+
+# Caching with BuildKit: https://pythonspeed.com/articles/docker-cache-pip-downloads/
 # In you dev environment, be sure BuildKit is active using an enivornment variable:
 # export DOCKER_BUILDKIT=1
-#RUN --mount=type=cache,target=/root/.cache \
+# This setting may be permenently enabled on Ubuntu by adding it to user profile config
+# via `gedit ~/.profile` in terminal
+RUN --mount=type=cache,target=/root/.cache \
+  pip install --upgrade -r requirements.txt
+
+COPY ./alembic.ini alembic.ini
+COPY ./pyproject.toml pyproject.toml
+COPY ./alembic alembic
+COPY ./demo_backend demo_backend
+COPY ./stubs stubs
+COPY ./tests tests
+
+ENV PYTHONPATH=./
+
+EXPOSE 8883
+
+FROM python:3.10-slim as production
+
+LABEL maintainer="Stoneguard Software LLC <contact@stoneguardsoftware.com>"
+
+# Ensure curl is available for healthcheck via curl
+RUN apt update
+RUN apt upgrade -y
+RUN apt install curl -y
+
+# Install git. NOTE: The Git repo and information will be mounted via docker-compose
+# The additional packages are to support compiling google-re python wheel with the C++
+# library
+RUN apt-get install -y --no-install-recommends git gcc g++ libre2-dev
+RUN apt-get purge -y --auto-remove
+RUN rm -rf /var/lib/apt/lists/*
+
+WORKDIR /fastapi_demo/backend
+
+COPY ./start.sh start.sh
+RUN chmod +x start.sh
+
+COPY ./gunicorn_conf.py gunicorn_conf.py
+
+COPY ./start-reload.sh start-reload.sh
+RUN chmod +x start-reload.sh
+
+COPY ./prestart.sh prestart.sh
+RUN chmod +x prestart.sh
+
+COPY --from=requirements-stage /tmp/requirements.txt /fastapi_demo/backend/requirements.txt
+
+# Caching with BuildKit: https://pythonspeed.com/articles/docker-cache-pip-downloads/
+# In you dev environment, be sure BuildKit is active using an enivornment variable:
+# export DOCKER_BUILDKIT=1
+# This setting may be permenently enabled on Ubuntu by adding it to user profile config
+# via `gedit ~/.profile` in terminal
+RUN --mount=type=cache,target=/root/.cache \
+  pip install --upgrade -r requirements.txt
 
 # Alternate caching method without BuildKit as recommended on FastAPI docs:
 # https://fastapi.tiangolo.com/deployment/docker/#docker-cache
-RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
+#RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
-COPY ./alembic /app/alembic
-COPY ./tests /app/tests
-COPY demo_backend /app/demo_backend
-WORKDIR /app/
+COPY ./alembic.ini alembic.ini
+COPY ./pyproject.toml pyproject.toml
+COPY ./alembic alembic
+COPY ./demo_backend demo_backend
 
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=./
 
 EXPOSE 8883
 
