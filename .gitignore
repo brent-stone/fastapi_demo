@@ -157,3 +157,5 @@ cython_debug/
 
 *.env
 /.python-version
+*.crt
+*.key

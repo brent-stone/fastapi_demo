@@ -4,7 +4,7 @@ services:
   api:
     # This starts GUnicorn without live-reload
     command: /start.sh
-    container_name: demo_backend-api
+    container_name: demo-backend-api
     # env_file:
     #   - .env
     # The .env import function is nice, but let's explicitly have some redundant setting declaration
@@ -47,8 +47,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      celery:
-        condition: service_healthy
+#      celery:
+#        condition: service_healthy
     healthcheck:
       # Note: The INFO logs that may appear in the logs are from FastAPI/Gunicorn, not curl
       test: [ "CMD-SHELL",
