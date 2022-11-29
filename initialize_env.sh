@@ -105,15 +105,15 @@ FLOWER_PORT="57077"
 KEYCLOAK_PORT=8080
 DB_VENDOR=POSTGRES
 DB_ADDR=db
-DB_DATABASE=autoai_keycloak_db
+DB_DATABASE=demo_keycloak_db
 DB_USER=keycloak
 DB_SCHEMA=public
 rando_string
 DB_PASSWORD="${RANDOM_STRING}"
-KEYCLOAK_ADMIN=autoai_admin
+KEYCLOAK_ADMIN=demo_admin
 rando_string
 KEYCLOAK_ADMIN_PASSWORD="${RANDOM_STRING}"
-KEYCLOAK_USER=autoai_keycloak
+KEYCLOAK_USER=demo_keycloak
 rando_string
 KEYCLOAK_PASSWORD="${RANDOM_STRING}"
 
