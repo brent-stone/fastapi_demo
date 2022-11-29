@@ -6,12 +6,6 @@ authors = ["Brent Stone <brent-stone@github.com>"]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.11"
-pandas = "^1.4.1"
-scipy = "^1.8.0"
-scikit-learn = "^1.0.2"
-python-can = "^4.0.0"
-can-isotp = "^1.7"
-numpy = "^1.22.2"
 fastapi = "^0.79.0"
 uvicorn = {extras = ["standard"], version = "^0.17.5"}
 gunicorn = "^20.1.0"
@@ -66,4 +60,3 @@ env_files = ".test.env"
 log_cli=true
 log_auto_indent=true
 log_level="DEBUG"
-
