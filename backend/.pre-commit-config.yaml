@@ -19,7 +19,6 @@ repos:
     -   id: mixed-line-ending
         args: ['--fix=auto']
     -   id: name-tests-test
-        args: ['--pytest-test-first']
     -   id: pretty-format-json
         args: ['--autofix']
     -   id: check-merge-conflict

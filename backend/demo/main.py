@@ -1,8 +1,9 @@
 """
 Primary FastAPI application instance creation
 """
+from demo.core.config import core_config
+from demo.core.config import core_logger
 from fastapi import FastAPI
-from demo.core.config import core_config, core_logger
 
 
 def get_application() -> FastAPI:
