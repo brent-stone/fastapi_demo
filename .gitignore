@@ -156,3 +156,8 @@ cython_debug/
 .vscode/
 
 *.env
+/.python-version
+*.crt
+*.key
+
+backend/.python-version

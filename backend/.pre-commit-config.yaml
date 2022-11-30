@@ -1,11 +1,11 @@
 default_language_version:
-    python: python3.10.2
+    python: python3.10
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.1.0
+    rev: v4.3.0
     hooks:
     -   id: end-of-file-fixer
-        files: ^.idea/
+        exclude: ^(.idea/|.venv/|docs/)
     -   id: trailing-whitespace
         exclude: ^docs/
     -   id: check-executables-have-shebangs
@@ -19,76 +19,63 @@ repos:
     -   id: mixed-line-ending
         args: ['--fix=auto']
     -   id: name-tests-test
+        args: ['--pytest-test-first']
     -   id: pretty-format-json
         args: ['--autofix']
     -   id: check-merge-conflict
     -   id: debug-statements
     -   id: no-commit-to-branch
         # Both master and main are protected by default. Merge requests only.
--   repo: https://github.com/PyCQA/flake8
-    rev: 4.0.1
-    hooks:
-    -   id: flake8
-        additional_dependencies: [flake8-typing-imports==1.7.0]
-        args: ['--max-line-length=88']
--   repo: https://github.com/asottile/reorder_python_imports
-    rev: v2.6.0
-    hooks:
-    -   id: reorder-python-imports
-        args: ['--py3-plus']
--   repo: https://github.com/asottile/setup-cfg-fmt
-    rev: v1.20.0
-    hooks:
-    -   id: setup-cfg-fmt
--   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.931
-    hooks:
-    -   id: mypy
-        additional_dependencies:
-        -   types-all
-        -   pydantic
-        -   numpy
-        -   pandas
-        -   pandas-stubs
-        args:
-        -   --no-strict-optional
-        -   --ignore-missing-imports
 -   repo: https://github.com/psf/black
-    rev: 21.12b0
+    rev: 22.10.0
     hooks:
     -   id: black
         # It is recommended to specify the latest version of Python
         # supported by your project here, or alternatively use
         # pre-commit's default_language_version, see
         # https://pre-commit.com/#top_level-default_language_version
-        # language_version: python3.8
--   repo: https://github.com/Lucas-C/pre-commit-hooks-safety
-    rev: v1.2.2
+        # language_version: python3.10
+        additional_dependencies: [tomli==2.0.1]
+        args:
+            - --include='\.pyi?$'
+            # these folders won't be formatted by black
+            - --exclude="""\.git |
+                \.__pycache__|
+                \.hg|
+                \.mypy_cache|
+                \.tox|
+                \.venv|
+                _build|
+                buck-out|
+                build|
+                dist|
+                docs"""
+-   repo: https://github.com/PyCQA/flake8
+    rev: 5.0.4
     hooks:
-    -   id: python-safety-dependencies-check
-        files: pyproject.toml
+    -   id: flake8
+        additional_dependencies: [flake8-typing-imports==1.14.0]
+        args:
+            - '--max-line-length=88'
+            - '--max-complexity=18'
+            - '--select=B,C,E,F,W,T4,B9'
+            - '--extend-ignore=E203,E266,E501,W503'
+-   repo: https://github.com/asottile/reorder_python_imports
+    rev: v3.9.0
+    hooks:
+    -   id: reorder-python-imports
+        args: ['--py3-plus']
+-   repo: https://github.com/asottile/setup-cfg-fmt
+    rev: v2.2.0
+    hooks:
+    -   id: setup-cfg-fmt
 -   repo: https://github.com/PyCQA/bandit
-    rev: 1.7.1
+    rev: 1.7.4
     hooks:
     -   id: bandit
         language_version: python3
-        exclude: ^tests/
+        files: ^demo_backend/
         args:
         -   -s
+        -   B104
         -   B101
--   repo: https://github.com/econchick/interrogate
-    rev: 1.5.0
-    hooks:
-    -   id: interrogate
-        args:
-        -   -vv
-        -   --ignore-init-method
-        -   --fail-under=95
--   repo: local
-    hooks:
-    -   id: pytest
-        name: Check pytest with coverage passes
-        entry: poetry run pytest --cov=demo_backend
-        pass_filenames: false
-        language: system
-        types: [python]

@@ -8,7 +8,7 @@ on legacy compatability settings.
 - [ ] Ensure docker compose is installed
 - [ ] Ensure Poetry is available at system level environment via `pip install poetry`
 - [ ] `chmod +x initialize_env.sh`
-- [ ] run `initialize_env.sh` to auto-generate a .env in the top level directory and a .test.env in the /backend 
+- [ ] run `initialize_env.sh` to auto-generate a .env in the top level directory and a .test.env in the /backend
 directory
 - [ ] `docker compose up`
 - [ ] From local dev host, run the following to initialize to setup local Poetry virtual environment and postgres testing table:
@@ -48,9 +48,9 @@ See [this blog](https://www.jeffastor.com/blog/populating-cleaning-jobs-with-use
   - `docker compose down` to shutdown the orchestrated containers.
 - Go to http://127.0.0.1/docs \[ip:port for dev] to see the automatic interactive API documentation (provided by Swagger UI).
 - Go to http://127.0.0.1/redoc \[ip:port for dev] to see the alternative automatic documentation (provided by ReDoc)
-- Open terminal in API container: `docker compose exec -it demo_backend-backend-dev bash`
+- Open terminal in API container: `docker exec -ti demo-backend-api-dev /bin/bash`
   - `exit` to exit the session.
-- Open psql session in DB container: `docker compose exec db psql -h localhost -U postgres --dbname=postgres`
+- Open psql session in DB container: `docker exec -ti demo_backend-db psql -h localhost -U demo --dbname=demo`
   - `\q` to exit the session.
   - `\d` to list tables.
   - `TABLE <tablename>;` to list table contents.

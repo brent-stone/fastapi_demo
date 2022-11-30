@@ -1,97 +1,54 @@
 services:
   api:
     # This starts GUnicorn with live-reload
-    command: /start-reload.sh
-    container_name: demo_backend-api-dev
-    image: autoai-api-dev
-    volumes:
-      # Mount local host's code into the container for 'live' development
-      - ./backend/demo_backend:/app/demo_backend
-      - ./backend/alembic:/app/alembic
-#      - ./backend/tests:/app/tests
-    environment:
-      DEBUG: 'true'
-      PYTHONUNBUFFERED: 1
-#
-#  web:
-##    command: yarn start
-#    container_name: demo_backend-frontend-dev
-#    image: demo_backend-frontend-dev
-#    build:
-#      context: ./frontend
-#      dockerfile: Dockerfile
-#      target: development
-#    volumes:
-#      - ./frontend/src:/app/src
-#    ports:
-#      - "3000:3000"
-#    environment:
-#      DEBUG: 'true'
-
-  adminer:
-    image: adminer
-    container_name: demo_backend-adminer-dev
-    restart: always
-    ports:
-      - target: 8080
-        published: 5701
-        mode: host
-
-  db:
-    container_name: demo_backend-db-dev
-    ports:
-      - "${POSTGRES_PORT:?missing .env file with POSTGRES_PORT}:5432"
-
-  redis:
-    container_name: demo_backend-redis-dev
-    ports:
-      - target: 6379
-        published: 6379
-        mode: host
-
-  worker:
-    container_name: demo_backend-celery-dev
-#    volumes:
-#      - ./backend/demo_backend:/app/demo_backend
-    environment:
-      DEBUG: 'true'
-      PYTHONUNBUFFERED: 1
-
-  dashboard:
-    command:
-      celery --app=demo_backend.celery.celery flower --loglevel=info
-    container_name: demo_backend-flower-dev
-    restart: always
-    ports:
-      - target: 5555
-        published: 5556
-        mode: host
-    environment:
-      DEBUG: 'true'
-
-      PROJECT_NAME: "${PROJECT_NAME:?missing .env file with PROJECT_NAME}"
-      PROJECT_VERSION: "${PROJECT_VERSION:?missing .env file with PROJECT_VERSION}"
-      DEFAULT_EMAIL: "${DEFAULT_EMAIL:?missing .env file with DEFAULT_EMAIL}"
-
-      SECRET_KEY: "{SECRET_KEY:?missing .env file with SECRET_KEY}"
-      HASH_ALGORITHM: "${HASH_ALGORITHM:?missing .env file with HASH_ALGORITHM}"
-      ACCESS_TOKEN_EXPIRE_MINUTES: "${ACCESS_TOKEN_EXPIRE_MINUTES:?missing .env file with ACCESS_TOKEN_EXPIRE_MINUTES}"
-      BACKEND_CORS_ORIGINS: "${BACKEND_CORS_ORIGINS:?missing .env file with BACKEND_CORS_ORIGINS}"
-
-      POSTGRES_USER: "${POSTGRES_USER:?missing .env file with POSTGRES_USER}"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?missing .env file with POSTGRES_PASSWORD}"
-      POSTGRES_DB: "${POSTGRES_DB:?missing .env file with POSTGRES_DB}"
-      POSTGRES_SERVER: "${POSTGRES_SERVER:?missing .env file with POSTGRES_SERVER}"
-      POSTGRES_PORT: "${POSTGRES_PORT:?missing .env file with POSTGRES_PORT}"
-
-      CELERY_BROKER_URL: "${CELERY_BROKER_URL:?missing .env file with CELERY_BROKER_URL}"
-      CELERY_RESULT_BACKEND: "${CELERY_RESULT_BACKEND:?missing .env file with CELERY_RESULT_BACKEND}"
+    command: /fastapi_demo/backend/start-reload.sh
+    container_name: demo-backend-api-dev
+    image: demo-backend-api-dev
     build:
       context: ./backend
       dockerfile: Dockerfile
-      target: production
+      target: development
+    volumes:
+      # We can't just mount everything because start and pre-start permissions will be
+      # denied.
+      # "Top Level" /fastapi_demo mounting
+      - ./.git:/fastapi_demo/.git
+      - ./.gitignore:/fastapi_demo/.gitignore
+#      - ./.idea:/fastapi_demo/.idea
+      - ./initialize_env_and_cert.sh:/fastapi_demo/initialize_env_and_cert.sh
+#      - ./frontend:/fastapi_demo/frontend
+      - ./postgres:/fastapi_demo/postgres
+      # /backend folder mounting
+      - ./backend/alembic:/fastapi_demo/backend/alembic
+      - ./backend/demo_backend:/fastapi_demo/backend/demo_backend
+      - ./backend/stubs:/fastapi_demo/backend/stubs
+      - ./backend/tests:/fastapi_demo/backend/tests
+      # /backend file mounting
+      - ./backend/.coveragerc:/fastapi_demo/backend/.coveragerc
+      - ./backend/.flake8:/fastapi_demo/backend/.flake8
+      - ./backend/.pre-commit-config.yaml:/fastapi_demo/backend/.pre-commit-config.yaml
+      - ./backend/alembic.ini:/fastapi_demo/backend/alembic.ini
+      - ./backend/gunicorn_conf.py:/fastapi_demo/backend/gunicorn_conf.py
+      - ./backend/mypy.ini:/fastapi_demo/backend/mypy.ini
+      - ./backend/pyproject.toml:/fastapi_demo/backend/pyproject.toml
+      - ./backend/tox.ini:/fastapi_demo/backend/tox.ini
+    environment:
+      # Enable Python interpreter specific development settings
+      PYTHONUNBUFFERED: 0
+      PYTHONWARNINGS: always
+      #  PYTHONDEVMODE: 1
+      # FastAPI SQLAlchemy 2.0 Migration specific warning flag
+      # remove once SQLAlchemy is officially updated to 2.0
+      SQLALCHEMY_WARN_20: "${SQLALCHEMY_WARN_20:?missing .env file with SQLALCHEMY_WARN_20}"
+
+  adminer:
+    image: adminer
+    container_name: demo-backend-adminer
+    restart: always
+    ports:
+      - target: 8080
+        published: "${ADMINER_PORT:?missing .env file with ADMINER_PORT}"
+        mode: host
     depends_on:
-      redis:
+      db:
         condition: service_healthy
-
-
