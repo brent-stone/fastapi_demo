@@ -1599,6 +1599,14 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
+name = "ujson"
+version = "5.5.0"
+description = "Ultra fast JSON encoder and decoder for Python"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[[package]]
 name = "ukkonen"
 version = "1.0.1"
 description = "Implementation of bounded Levenshtein distance (Ukkonen)"
@@ -1725,7 +1733,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "flake8 (<5)", "pytest-co
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9,<3.11"
-content-hash = "2f9ff515c82e751ba967f15f5843844d5b31211559d9a08e0d524a9efe900783"
+content-hash = "957363a8303b1bfabfd673a5fb83e5409c3e8641989b9064d2a40bf6ee1b1f56"
 
 [metadata.files]
 aiofiles = []
@@ -2082,6 +2090,7 @@ tox-pyenv = [
 ]
 types-pytz = []
 typing-extensions = []
+ujson = []
 ukkonen = [
     {file = "ukkonen-1.0.1-cp36-abi3-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:65fd12846012f3a36b818fa95c04e85a6f31d7ec620c71e8835dbc1ba9b9a651"},
     {file = "ukkonen-1.0.1-cp36-abi3-win32.whl", hash = "sha256:8e9991714c99ee975ff4d84daaed21661e7a298444b69fe25f322de2de156191"},
