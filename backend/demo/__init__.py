@@ -1,3 +1,0 @@
-"""
-A FastAPI demonstration module
-"""
