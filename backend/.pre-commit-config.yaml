@@ -74,7 +74,7 @@ repos:
     hooks:
     -   id: bandit
         language_version: python3
-        files: ^demo_backend/
+        files: ^demo/
         args:
         -   -s
         -   B104

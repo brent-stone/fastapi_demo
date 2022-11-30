@@ -30,8 +30,8 @@ See [this blog](https://www.jeffastor.com/blog/populating-cleaning-jobs-with-use
 
 ### Build the FastAPI backend container
 
-- [ ] Open terminal in the `/demo_backend/backend/` folder
-- [ ] `DOCKER_BUILDKIT=1 docker build -t demo_backend_api_image .`
+- [ ] Open terminal in the `/fastapi_demo/backend/` folder
+- [ ] `DOCKER_BUILDKIT=1 docker build -t demo_api_image .`
 - [ ] To build from compose with terminal in project root: `DOCKER_BUILDKIT=1 docker compose up --build`
 
 **STRONGLY RECOMMEND**: Update your git settings so it doesn't auto-convert to windows line endings when pulling onto a windows box:
@@ -48,9 +48,9 @@ See [this blog](https://www.jeffastor.com/blog/populating-cleaning-jobs-with-use
   - `docker compose down` to shutdown the orchestrated containers.
 - Go to http://127.0.0.1/docs \[ip:port for dev] to see the automatic interactive API documentation (provided by Swagger UI).
 - Go to http://127.0.0.1/redoc \[ip:port for dev] to see the alternative automatic documentation (provided by ReDoc)
-- Open terminal in API container: `docker exec -ti demo-backend-api-dev /bin/bash`
+- Open terminal in API container: `docker exec -ti demo-api-dev /bin/bash`
   - `exit` to exit the session.
-- Open psql session in DB container: `docker exec -ti demo_backend-db psql -h localhost -U demo --dbname=demo`
+- Open psql session in DB container: `docker exec -ti demo-db psql -h localhost -U demo --dbname=demo`
   - `\q` to exit the session.
   - `\d` to list tables.
   - `TABLE <tablename>;` to list table contents.
@@ -67,17 +67,17 @@ Docker compose 2 looks for `docker-compose.yml` to begin orchestration. However,
 `docker-compose.override.yml` to, you guessed it, override some settings from the based configuration.
 
 `docker-compose.override.yml` is the 'dev' settings enabling hot reload via `start-reload.sh` and mounting the local
-`\backend\demo_backend` directory to the container's `\app\demo_backend` directory. `start-reload.sh` directly runs a single uvicorn
+`\backend\demo` directory to the container's `\backend\demo` directory. `start-reload.sh` directly runs a single uvicorn
 worker with hot reload enabled.
 
-`docker-compose.prod.yml` forgoes that local file system mounting (only use what's in the demo_backend-api image) and
+`docker-compose.prod.yml` forgoes that local file system mounting (only use what's in the demo-api image) and
 instead runs `start.sh`. `start.sh` runs Gunicorn which spawns _n_ uvicorn workers where _n_ is the number of cores on
 the server.
 
 #### Only run the FastAPI container
 Using a terminal inside the `/backend` folder...
-- [ ] Run "live" dev: `docker run -d --name demo_backend_api_dev -p 80:80 -v $(pwd):/app demo_backend_api_image /start-reload.sh`
-- [ ] Run prod: `docker run -d --name demo_backend_api_prod -p 80:80 demo_backend_api_image`
+- [ ] Run "live" dev: `docker run -d --name demo_api_dev -p 80:80 -v $(pwd):/app demo_api_image /start-reload.sh`
+- [ ] Run prod: `docker run -d --name demo_api_prod -p 80:80 demo_api_image`
 
 **NOTE**: To stop the server (e.g. to swap from dev to prod): `docker stop <container name>`
 
@@ -123,7 +123,7 @@ walkthough of a containerized webapp using FastAPI, Postgres, and React.
 - Use a URL style tag for the image then build it.
   - `docker build -t registry.gitlab.com/<user or group>/<project name>/<image_name> .`
 - Use the URL style tag to then push to the container registry.
-  - `docker push registry.gitlab.com/<user or group>/<project name>/demo_backend-backend-prod`
+  - `docker push registry.gitlab.com/<user or group>/<project name>/demo-api`
 
 
 ## Pytest tips
