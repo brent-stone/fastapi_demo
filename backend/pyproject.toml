@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "demo_backend"
+name = "demo"
 version = "0.1.0"
 description = "Demonstration of containerized FastAPI REST api with Postgres (SQLAlchemy+Alembic) and Redis (Celery+Flower)."
 authors = ["Brent Stone <brent-stone@github.com>"]

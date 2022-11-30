@@ -1,7 +1,7 @@
 #! /usr/bin/env sh
 set -e
 
-DEFAULT_MODULE_NAME=demo_backend.main
+DEFAULT_MODULE_NAME=demo.main
 
 MODULE_NAME=${MODULE_NAME:-$DEFAULT_MODULE_NAME}
 VARIABLE_NAME=${VARIABLE_NAME:-app}
@@ -11,15 +11,8 @@ HOST=${HOST:-0.0.0.0}
 PORT=${PORT:-8883}
 LOG_LEVEL=${LOG_LEVEL:-info}
 
-# If there's a prestart.sh script in the /app directory or other path specified, run it before starting
-PRE_START_PATH=${PRE_START_PATH:-/app/prestart.sh}
-echo "Checking for script in $PRE_START_PATH"
-if [ -f $PRE_START_PATH ] ; then
-    echo "Running script $PRE_START_PATH"
-    . "$PRE_START_PATH"
-else
-    echo "There is no script $PRE_START_PATH"
-fi
+# Run the pre-start script to trigger Alembic migration and other pre-start actions
+/bin/bash prestart.sh
 
 # Start Uvicorn with live reload
 exec uvicorn --reload --host $HOST --port $PORT --log-level $LOG_LEVEL "$APP_MODULE"

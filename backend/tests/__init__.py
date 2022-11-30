@@ -1,3 +1,3 @@
 """
-Test suite for demo_backend
+Test suite for demo
 """

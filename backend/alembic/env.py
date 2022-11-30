@@ -1,22 +1,20 @@
-from logging import getLogger
-from logging import INFO
 from logging.config import fileConfig
 
 from alembic import context
-# from demo_backend.core.config import core_config
-# from demo_backend.database import Base
-# from demo_backend.database import engine_default
-# from demo_backend.database import engine_generic
-# from demo_backend.database import engine_user
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
 from sqlalchemy.engine import Engine
-from sqlalchemy.exc import OperationalError
-from sqlalchemy.sql.schema import MetaData
 
-getLogger("sqlalchemy.engine").setLevel(INFO)
+# from sqlalchemy import engine_from_config
+# from sqlalchemy import pool
 
-logger = getLogger(__name__)
+# from sqlalchemy.exc import OperationalError
+# from sqlalchemy.sql.schema import MetaData
+
+# from demo.core.config import core_config
+# from demo.core.config import core_logger as logger
+# from demo.database import Base
+# from demo.database import engine_default
+# from demo.database import engine_generic
+# from demo.database import engine_user
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -64,7 +62,8 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    logger.info("Running Alembic migration online.")
+    pass
+    # logger.info("Running Alembic migration online.")
     # logger.info(f"SQLAlchemy metadata tables: {list(target_metadata.tables)}")
     #
     # # Ensure the default postgres user:pass combo has an associated database for the user so Postgres is happy
@@ -104,7 +103,8 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    logger.info("Running Alembic migration offline.")
+    pass
+    # logger.info("Running Alembic migration offline.")
     # logger.info(f"SQLAlchemy metadata tables: {list(target_metadata.tables)}")
     #
     # context.configure(

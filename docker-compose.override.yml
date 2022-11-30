@@ -2,8 +2,8 @@ services:
   api:
     # This starts GUnicorn with live-reload
     command: /fastapi_demo/backend/start-reload.sh
-    container_name: demo-backend-api-dev
-    image: demo-backend-api-dev
+    container_name: demo-api-dev
+    image: demo-api-dev
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -20,7 +20,7 @@ services:
       - ./postgres:/fastapi_demo/postgres
       # /backend folder mounting
       - ./backend/alembic:/fastapi_demo/backend/alembic
-      - ./backend/demo_backend:/fastapi_demo/backend/demo_backend
+      - ./backend/demo:/fastapi_demo/backend/demo
       - ./backend/stubs:/fastapi_demo/backend/stubs
       - ./backend/tests:/fastapi_demo/backend/tests
       # /backend file mounting
@@ -43,7 +43,7 @@ services:
 
   adminer:
     image: adminer
-    container_name: demo-backend-adminer
+    container_name: demo-adminer
     restart: always
     ports:
       - target: 8080
