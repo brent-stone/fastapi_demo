@@ -26,7 +26,7 @@ fi
 RANDOM_STRING="random_string_was_not_generated!!"
 STRING_LENGTH=32
 
-RANDOM_STRING_CORPUS='A-Za-z0-9!#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~'
+RANDOM_STRING_CORPUS='A-Za-z0-9!#%&'\''()*+,-./:;<=>?@[\]^_`{|}~'
 RANDOM_USER_CORPUS='A-Za-z@_#'
 # Function to generate a STRING_LENGTH string of characters
 rando_string() {
@@ -59,7 +59,7 @@ HTTPS_PORT="57443"
 
 # Used by FastAPI and Pydantic BaseSettings ingest
 API_PORT="57073"
-PROJECT_NAME="FastAPI Demo"
+PROJECT_NAME="\"FastAPI Demo\""
 PROJECT_VERSION="0.1.0"
 BACKEND_CORS_ORIGINS="[\
 \"http://localhost\",\

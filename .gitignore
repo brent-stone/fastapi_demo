@@ -159,3 +159,5 @@ cython_debug/
 /.python-version
 *.crt
 *.key
+
+backend/.python-version

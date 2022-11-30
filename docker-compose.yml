@@ -59,7 +59,7 @@ services:
       start_period: 5s
 
   db:
-    container_name: demo_backend-db
+    container_name: demo-backend-db
     build:
       context: ./postgres
       dockerfile: Dockerfile
@@ -89,7 +89,7 @@ services:
     restart: always
 
   redis:
-    container_name: demo_backend-redis
+    container_name: demo-backend-redis
     image: redis:7-alpine
     ports:
       - target: 6379

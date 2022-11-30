@@ -1,8 +1,11 @@
+# syntax=docker/dockerfile:1
 FROM python:3.10-slim as requirements-stage
 
 WORKDIR /tmp
 
-RUN pip install poetry
+# Ensure the latest version of pip is installed so the latest version of poetry is
+# used
+RUN pip install --upgrade pip poetry
 
 COPY ./pyproject.toml pyproject.toml
 COPY ./poetry.lock poetry.lock
@@ -15,14 +18,21 @@ FROM python:3.10-slim as development
 LABEL maintainer="Brent Stone <brent-stone@github.com>"
 
 # Ensure curl is available for healthcheck via curl
-RUN apt update
-RUN apt upgrade -y
-RUN apt install curl -y
-
-# Install git. NOTE: The Git repo and information will be mounted via docker-compose
+# Also ensure git and other dev dependencies are available for in container development
+# "Always combine RUN apt-get update with apt-get install in the same RUN statement."
+# https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#run
+# NOTE: The Git repo and information will be mounted via docker-compose
 # The additional packages are to support compiling google-re python wheel with the C++
 # library
-RUN apt-get install -y --no-install-recommends git gcc g++ libre2-dev
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
+    curl \
+    git \
+    gcc \
+    g++ \
+    libre2-dev
+    # Add additional installations here with trailing `\` on each line \
+
+# Cleanup the apt cache to reduce image size
 RUN apt-get purge -y --auto-remove
 RUN rm -rf /var/lib/apt/lists/*
 
@@ -65,9 +75,11 @@ FROM python:3.10-slim as production
 LABEL maintainer="Stoneguard Software LLC <contact@stoneguardsoftware.com>"
 
 # Ensure curl is available for healthcheck via curl
-RUN apt update
-RUN apt upgrade -y
-RUN apt install curl -y
+# "Always combine RUN apt-get update with apt-get install in the same RUN statement."
+# https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#run
+RUN apt-get update && apt-get upgrade -y && apt-get install -y \
+    curl
+# Add additional installations here with trailing `\` on each line
 
 # Install git. NOTE: The Git repo and information will be mounted via docker-compose
 # The additional packages are to support compiling google-re python wheel with the C++
