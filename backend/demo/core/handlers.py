@@ -3,11 +3,15 @@ FastAPI Middleware startup and shutdown handlers
 """
 from typing import Callable
 
+from databases import Database
+from databases import DatabaseURL
 from demo.api.v1 import api_router_v1
 from demo.core.config import core_config
+from demo.core.config import core_logger as logger
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseSettings
+from starlette.config import Config
 
 
 def create_start_app_handler(
@@ -38,6 +42,24 @@ def create_start_app_handler(
             allow_headers=["*"],
         )
 
+        # Attempt to connect to the database
+        config = Config()
+        l_db_url = config(
+            "DATABASE_URL",
+            cast=DatabaseURL,
+            default=a_config.DATABASE_URI,
+        )
+        # these can be configured in config as well
+        database = Database(l_db_url)
+
+        try:
+            await database.connect()
+            a_app.state._db = database
+        except Exception as e:
+            logger.warning("--- DB CONNECTION ERROR ---")
+            logger.warning(e)
+            logger.warning("--- DB CONNECTION ERROR ---")
+
     return start_app
 
 
@@ -53,6 +75,11 @@ def create_stop_app_handler(app: FastAPI) -> Callable:
         Mutate the FastAPI app instance prior to shut down
         :return: Nothing
         """
-        pass
+        try:
+            await app.state._db.disconnect()
+        except Exception as e:
+            logger.warning("--- DB DISCONNECT ERROR ---")
+            logger.warning(e)
+            logger.warning("--- DB DISCONNECT ERROR ---")
 
     return stop_app
