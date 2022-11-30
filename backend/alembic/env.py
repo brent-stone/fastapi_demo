@@ -3,11 +3,11 @@ from logging import INFO
 from logging.config import fileConfig
 
 from alembic import context
-# from demo_backend.core.config import core_config
-# from demo_backend.database import Base
-# from demo_backend.database import engine_default
-# from demo_backend.database import engine_generic
-# from demo_backend.database import engine_user
+# from demo.core.config import core_config
+# from demo.database import Base
+# from demo.database import engine_default
+# from demo.database import engine_generic
+# from demo.database import engine_user
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from sqlalchemy.engine import Engine

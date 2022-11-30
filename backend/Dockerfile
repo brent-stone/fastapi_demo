@@ -62,7 +62,7 @@ RUN --mount=type=cache,target=/root/.cache \
 COPY ./alembic.ini alembic.ini
 COPY ./pyproject.toml pyproject.toml
 COPY ./alembic alembic
-COPY ./demo_backend demo_backend
+COPY demo demo
 COPY ./stubs stubs
 COPY ./tests tests
 
@@ -118,7 +118,7 @@ RUN --mount=type=cache,target=/root/.cache \
 COPY ./alembic.ini alembic.ini
 COPY ./pyproject.toml pyproject.toml
 COPY ./alembic alembic
-COPY ./demo_backend demo_backend
+COPY demo demo
 
 ENV PYTHONPATH=./
 

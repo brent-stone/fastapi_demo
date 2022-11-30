@@ -1,7 +1,7 @@
 #! /usr/bin/env sh
 set -e
 
-DEFAULT_MODULE_NAME=demo_backend.main
+DEFAULT_MODULE_NAME=demo.main
 
 MODULE_NAME=${MODULE_NAME:-$DEFAULT_MODULE_NAME}
 VARIABLE_NAME=${VARIABLE_NAME:-app}
@@ -11,15 +11,8 @@ DEFAULT_GUNICORN_CONF=gunicorn_conf.py
 export GUNICORN_CONF=${GUNICORN_CONF:-$DEFAULT_GUNICORN_CONF}
 export WORKER_CLASS=${WORKER_CLASS:-"uvicorn.workers.UvicornWorker"}
 
-# If there's a prestart.sh script in the /app directory or other path specified, run it before starting
-PRE_START_PATH=${PRE_START_PATH:-prestart.sh}
-echo "Checking for script in $PRE_START_PATH"
-if [ -f "$PRE_START_PATH" ] ; then
-    echo "Running script $PRE_START_PATH"
-    . "$PRE_START_PATH"
-else
-    echo "There is no script $PRE_START_PATH"
-fi
+# Run the pre-start script to trigger Alembic migration and other pre-start actions
+/bin/bash prestart.sh
 
 # Start Gunicorn
 exec gunicorn -k "$WORKER_CLASS" -c "$GUNICORN_CONF" "$APP_MODULE"

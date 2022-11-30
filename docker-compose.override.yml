@@ -20,7 +20,7 @@ services:
       - ./postgres:/fastapi_demo/postgres
       # /backend folder mounting
       - ./backend/alembic:/fastapi_demo/backend/alembic
-      - ./backend/demo_backend:/fastapi_demo/backend/demo_backend
+      - ./backend/demo:/fastapi_demo/backend/demo
       - ./backend/stubs:/fastapi_demo/backend/stubs
       - ./backend/tests:/fastapi_demo/backend/tests
       # /backend file mounting

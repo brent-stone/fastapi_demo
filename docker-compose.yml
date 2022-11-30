@@ -4,7 +4,7 @@ services:
   api:
     # This starts GUnicorn without live-reload
     command: /start.sh
-    container_name: demo-backend-api
+    container_name: demo-api
     # env_file:
     #   - .env
     # The .env import function is nice, but let's explicitly have some redundant setting declaration
