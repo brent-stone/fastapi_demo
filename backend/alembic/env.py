@@ -4,20 +4,16 @@ Alembic migration script configuration
 from logging.config import fileConfig
 
 from alembic import context
+from demo.core.config import core_config
+from demo.core.config import core_logger as logger
+from demo.database import Base
+from demo.database import engine_default
+from demo.database import engine_generic
+from sqlalchemy import engine_from_config
+from sqlalchemy import pool
 from sqlalchemy.engine import Engine
-
-# from sqlalchemy import engine_from_config
-# from sqlalchemy import pool
-
-# from sqlalchemy.exc import OperationalError
-# from sqlalchemy.sql.schema import MetaData
-
-# from demo.core.config import core_config
-# from demo.core.config import core_logger as logger
-# from demo.database import Base
-# from demo.database import engine_default
-# from demo.database import engine_generic
-# from demo.database import engine_user
+from sqlalchemy.exc import OperationalError
+from sqlalchemy.sql.schema import MetaData
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -28,7 +24,7 @@ config = context.config
 fileConfig(config.config_file_name)
 
 # add your model's MetaData object here for 'autogenerate' support
-# target_metadata: MetaData = Base.metadata
+target_metadata: MetaData = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -41,21 +37,20 @@ def detect_and_create_new_db(a_engine: Engine, a_database: str) -> None:
     Attempt to connect to the <a_database> database. If it doesn't exist (likely if this is
     the first time connecting or running tests), create it.
     """
-    pass
-    # try:
-    #     with a_engine.connect():
-    #         pass
-    # except OperationalError:
-    #     logger.info(f"Database {a_database} wasn't found. Attempting to create it.")
-    #     # NOTE: We're using the engine_generic here. See the notes in core_config.
-    #     try:
-    #         with engine_generic.connect() as l_connection:
-    #             l_connection.execute(f"CREATE DATABASE {a_database}")
-    #             logger.info(f"Created database {a_database}")
-    #     except OperationalError as e:
-    #         logger.error(
-    #             f"Failed to create database {a_database} using generic URI {str(engine_generic)}: {e}"
-    #         )
+    try:
+        with a_engine.connect():
+            pass
+    except OperationalError:
+        logger.info(f"Database {a_database} wasn't found. Attempting to create it.")
+        # NOTE: We're using the engine_generic here. See the notes in core_config.
+        try:
+            with engine_generic.connect() as l_connection:
+                l_connection.execute(f"CREATE DATABASE {a_database}")
+                logger.info(f"Created database {a_database}")
+        except OperationalError as e:
+            logger.error(
+                f"Failed to create database {a_database} using generic URI {str(engine_generic)}: {e}"
+            )
 
 
 def run_migrations_online() -> None:
@@ -65,32 +60,28 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    pass
-    # logger.info("Running Alembic migration online.")
-    # logger.info(f"SQLAlchemy metadata tables: {list(target_metadata.tables)}")
-    #
-    # # Ensure the default postgres user:pass combo has an associated database for the user so Postgres is happy
-    # # detect_and_create_new_db(engine_user, core_config.POSTGRES_USER)
-    #
-    # # Ensure the primary database is created if it doesn't already exist
-    # detect_and_create_new_db(engine_default, core_config.POSTGRES_DB)
-    #
-    # l_engine: Engine = engine_from_config(
-    #     config.get_section(config.config_ini_section),
-    #     prefix="sqlalchemy.",
-    #     poolclass=pool.NullPool,
-    #     url=core_config.DATABASE_URI,
-    #     echo=True,
-    # )
-    #
-    # with l_engine.connect() as connection:
-    #     context.configure(
-    #         connection=connection,
-    #         target_metadata=target_metadata,
-    #     )
-    #
-    #     with context.begin_transaction():
-    #         context.run_migrations()
+    logger.info("Running Alembic migration online.")
+    logger.info(f"SQLAlchemy metadata tables: {list(target_metadata.tables)}")
+
+    # Ensure the primary database is created if it doesn't already exist
+    detect_and_create_new_db(engine_default, core_config.POSTGRES_DB)
+
+    l_engine: Engine = engine_from_config(
+        config.get_section(config.config_ini_section),
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
+        url=core_config.DATABASE_URI,
+        echo=True,
+    )
+
+    with l_engine.connect() as connection:
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+        )
+
+        with context.begin_transaction():
+            context.run_migrations()
 
 
 def run_migrations_offline() -> None:
@@ -107,18 +98,18 @@ def run_migrations_offline() -> None:
 
     """
     pass
-    # logger.info("Running Alembic migration offline.")
-    # logger.info(f"SQLAlchemy metadata tables: {list(target_metadata.tables)}")
-    #
-    # context.configure(
-    #     url=core_config.DATABASE_URI,
-    #     target_metadata=target_metadata,
-    #     literal_binds=True,
-    #     dialect_opts={"paramstyle": "named"},
-    # )
-    #
-    # with context.begin_transaction():
-    #     context.run_migrations()
+    logger.info("Running Alembic migration offline.")
+    logger.info(f"SQLAlchemy metadata tables: {list(target_metadata.tables)}")
+
+    context.configure(
+        url=core_config.DATABASE_URI,
+        target_metadata=target_metadata,
+        literal_binds=True,
+        dialect_opts={"paramstyle": "named"},
+    )
+
+    with context.begin_transaction():
+        context.run_migrations()
 
 
 if context.is_offline_mode():
