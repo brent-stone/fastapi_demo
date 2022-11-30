@@ -4,8 +4,8 @@ User Pydantic Schemas
 from typing import Optional
 
 from demo.schemas import BaseModel
+from demo.schemas import generic_str
 from demo.schemas import render_safe_email
-from demo.schemas import username_str
 from pydantic import EmailStr
 from pydantic import validator
 
@@ -17,8 +17,8 @@ class UserLoginSchema(BaseModel):
     Facilitate user authentication
     """
 
-    username: username_str
-    password: str
+    username: generic_str
+    password: generic_str
 
     # _hash_pass = validator("password", allow_reuse=True)(Hasher.get_password_hash)
 
@@ -49,7 +49,7 @@ class UserAdminCreateUpdateSchema(UserCreateUpdateSchema):
     is_superuser: bool = False
 
 
-class ConfirmAdminDowngradeUpdateSchema(UserAdminCreateUpdateSchema):
+class UserAdminConfirmDowngradeUpdateSchema(UserAdminCreateUpdateSchema):
     """
     The optional confirm flag must be set to True if an admin is about to downgrade
     their own account from superuser to standard user.
@@ -69,7 +69,7 @@ class UserSchema(BaseModel):
     """
 
     id: int
-    username: username_str
+    username: generic_str
     email: EmailStr
     is_active: bool
     is_superuser: bool

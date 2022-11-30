@@ -24,7 +24,7 @@ from ujson import loads
 
 # A specific type of constrained strings for usernames and passwords to ensure they're
 # reasonable
-username_str = constr(strip_whitespace=True, min_length=3, max_length=64)
+generic_str = constr(strip_whitespace=True, min_length=3, max_length=64)
 
 # A specific type of constrained int for user ID to ensure they're reasonable
 user_id_int = conint(ge=1)
