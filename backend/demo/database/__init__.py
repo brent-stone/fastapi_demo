@@ -15,7 +15,7 @@ from sqlalchemy.orm import registry
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
 
-logger.info(f"[autoai.database] Database URI being used: {core_config.DATABASE_URI}")
+logger.info(f"[demo.database] Database URI being used: {core_config.DATABASE_URI}")
 
 engine_default: Engine = create_engine(
     core_config.DATABASE_URI, pool_pre_ping=True, future=True
