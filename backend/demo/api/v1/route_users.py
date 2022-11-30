@@ -1,6 +1,7 @@
 """
 CRUD routes for Users
 """
+from demo.core.config import core_logger as logger
 from demo.schemas.users import UserCreateUpdateSchema
 from demo.schemas.users import UserSchema
 from fastapi import APIRouter
@@ -24,6 +25,7 @@ def create_user_route(a_user: UserCreateUpdateSchema):
         UserSchema: A populated ShowUser schema and 201 on success; HTTPException on
         conflict or error
     """
+    logger.info(f"The hashed password is: {a_user.password}")
     l_return: UserSchema = UserSchema(
         id=1,
         is_active=False,

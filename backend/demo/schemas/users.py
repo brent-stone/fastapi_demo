@@ -3,13 +3,12 @@ User Pydantic Schemas
 """
 from typing import Optional
 
+from demo.core.hashing import Hasher
 from demo.schemas import BaseModel
 from demo.schemas import generic_str
 from demo.schemas import render_safe_email
 from pydantic import EmailStr
 from pydantic import validator
-
-# from demo.core.hashing import Hasher
 
 
 class UserLoginSchema(BaseModel):
@@ -20,7 +19,7 @@ class UserLoginSchema(BaseModel):
     username: generic_str
     password: generic_str
 
-    # _hash_pass = validator("password", allow_reuse=True)(Hasher.get_password_hash)
+    _hash_pass = validator("password", allow_reuse=True)(Hasher.get_password_hash)
 
 
 class UserCreateUpdateSchema(UserLoginSchema):
