@@ -72,7 +72,7 @@ EXPOSE 8883
 
 FROM python:3.10-slim as production
 
-LABEL maintainer="Stoneguard Software LLC <contact@stoneguardsoftware.com>"
+LABEL maintainer="Brent Stone <brent-stone@github.com>"
 
 # Ensure curl is available for healthcheck via curl
 # "Always combine RUN apt-get update with apt-get install in the same RUN statement."
